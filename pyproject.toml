@@ -1,0 +1,22 @@
+[tool.poetry]
+name = "daypy"
+version = "0.1.4"
+description = "一个日期时间解析器"
+authors = ["miclon <jcnd@163.com>"]
+homepage = "https://github.com/mic1on/daypy"
+keywords = ["日期解析", "年月日解析", "日期时间"]
+readme = "README.md"
+packages = [
+    { include = 'daypy', from = 'src'}
+]
+
+[tool.poetry.dependencies]
+python = "^3.8"
+arrow = "^1.2.2"
+
+[tool.poetry.dev-dependencies]
+pytest = "^7.1.2"
+
+[build-system]
+requires = ["poetry-core>=1.0.0"]
+build-backend = "poetry.core.masonry.api"
