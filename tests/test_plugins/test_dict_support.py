@@ -24,7 +24,11 @@ def test_dict_support():
         "s": 59
     }).format() == arrow.get('2022-3-10 10:24:59', tzinfo='local').format()
     assert daypy({
-            "hour": 10,
-            "minute": 24,
-            "second": 59
-        }).format() == arrow.get(tzinfo='local').replace(hour=10, minute=24, second=59).format()
+        "hour": 10,
+        "minute": 24,
+        "second": 59
+    }).format() == arrow.get(tzinfo='local').replace(hour=10, minute=24, second=59).format()
+
+    assert daypy(
+        daypy('2022-11-12 10:10:20').to_dict()
+    ).format() == daypy('2022-11-12 10:10:20').format()
