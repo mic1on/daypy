@@ -9,21 +9,11 @@ from arrow import Arrow
 from daypy.utils import import_object, pretty_unit, pretty_units
 
 
-class DayBase(object):
-    y = None
-    M = None
-    D = None
-    W = None
-    H = None
-    m = None
-    s = None
-    ms = None
-
-
-class Daypy(DayBase):
+class Daypy(object):
 
     def __init__(self, *args, **kwargs):
         self.dt: Optional[Arrow] = None
+        self.short_attrs = ['y', 'M', 'd', 'w', 'h', 'm', 's', 'ms']
         self.parse(*args, **kwargs)
 
     def parse(self, *args, **kwargs):
@@ -33,17 +23,6 @@ class Daypy(DayBase):
             self.dt = arrow.get(locale=locale, tzinfo=tz)
         else:
             self.dt = arrow.get(locale=locale, tzinfo=tz, *args, **kwargs)
-        self.init()
-
-    def init(self):
-        self.y = self.dt.year
-        self.M = self.dt.month
-        self.D = self.dt.date()
-        self.W = self.dt.day
-        self.H = self.dt.hour
-        self.m = self.dt.minute
-        self.s = self.dt.second
-        self.ms = self.dt.microsecond
 
     def format(self, fmt: str = "YYYY-MM-DD HH:mm:ssZZ", locale: str = 'zh'):
         return self.dt.format(fmt, locale=locale)
@@ -96,6 +75,12 @@ class Daypy(DayBase):
             return self == other
         return self.start_of(unit) <= other <= self.end_of(unit)
 
+    def value_of(self):
+        return round(self.dt.timestamp() * 1000)
+
+    def unix(self):
+        return round(self.value_of() / 1000)
+
     def _getter(self, attr, *args, **kwargs):
         if hasattr(self.dt, attr):
             return getattr(self.dt, attr)
@@ -125,6 +110,10 @@ class Daypy(DayBase):
         return self.dt == other.dt
 
     def __getattr__(self, attr):
+        # 特殊简写属性返回对应的值
+        if attr in self.short_attrs:
+            return getattr(self.dt, pretty_unit(attr))
+
         def wrapper(*args, **kwargs):
             if len(args):
                 return self._setter(attr, *args, **kwargs)
@@ -153,8 +142,11 @@ def daypy(*args, **kwargs):
 daypy.extend = extend
 
 if __name__ == '__main__':
-    print(daypy('2022-11-11 18:00:00').is_before('2022-11-11 18:00:01'))
-    print(daypy().is_before('2022-09-03 18:00:01'))
-    print(daypy('2021-10-10').is_before('2022-09-03 18:00:01', 'year'))
-    print(daypy('2021-10-10').is_same('2021-10-10'))
-
+    daypy.extend('to')
+    print(daypy('2022-11-12 10:10:20').to_dict())
+    # print(daypy('2022-11-11 18:00:00').is_before('2022-11-11 18:00:01'))
+    # print(daypy().is_before('2022-09-03 18:00:01'))
+    # print(daypy('2021-10-10').is_before('2022-09-03 18:00:01', 'year'))
+    # print(daypy('2021-10-10').is_same('2021-10-10'))
+    #
+    # print(daypy('2019-01-25').add(1, 'day').subtract(1, 'year').year(2009).unix())
