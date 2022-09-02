@@ -1,7 +1,5 @@
 # -*- coding: utf-8 -*-
-from datetime import datetime, timezone
-
-from daypy.constant import UnitEnum
+from daypy.constant import UnitEnum, UnitsEnum
 
 
 def import_object(name: str):
@@ -14,17 +12,6 @@ def import_object(name: str):
         return getattr(obj, parts[-1])
     except AttributeError:
         raise ImportError("No module named %s" % parts[-1])
-
-
-def get_int_length(num: int):
-    """获取整数的长度"""
-    if not isinstance(num, int):
-        raise ValueError("num must be int")
-    return str(num).__len__()
-
-
-def get_datetime_now(utc=None):
-    return datetime.now() if not utc else datetime.utcnow()
 
 
 def pretty_unit(u: str):
@@ -48,4 +35,28 @@ def pretty_unit(u: str):
     u = u.strip().lower()
     if u.endswith('s'):
         return u[0:-1]
+    return u
+
+
+def pretty_units(u: str):
+    if u is None:
+        return u
+    special = {
+        'M': UnitsEnum.M.value,
+        'y': UnitsEnum.Y.value,
+        'w': UnitsEnum.W.value,
+        'd': UnitsEnum.D.value,
+        'D': UnitsEnum.DATE.value,
+        'h': UnitsEnum.H.value,
+        'm': UnitsEnum.MIN.value,
+        's': UnitsEnum.S.value,
+        'ms': UnitsEnum.MS.value,
+        'Q': UnitsEnum.Q.value
+    }
+    ret = special.get(u)
+    if ret is not None:
+        return ret
+    u = u.strip().lower()
+    if not u.endswith('s'):
+        return f"{u}s"
     return u

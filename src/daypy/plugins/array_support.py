@@ -1,24 +1,26 @@
 # -*- coding: utf-8 -*-
+"""
+对数组类型的日期支持
+"""
+from copy import deepcopy
 from datetime import datetime
 
-from daypy.utils import get_datetime_now
+from daypy.utils import pretty_unit
 
 
 def array_support(option, Daypy, daypy):
     oldParse = Daypy.parse
 
-    def parse_date(cfg):
-        date = cfg.get('date')
-        utc = cfg.get('utc')
-        if not isinstance(date, list):
-            return date
-        if len(date) <= 0:
-            return get_datetime_now(utc)
+    def parse_date(value):
+        if not isinstance(value, list):
+            return
+        if len(value) <= 0:
+            return
 
-        return datetime(*date)
+        return datetime(*value)
 
-    def parse(_, cfg):
-        cfg['date'] = parse_date(cfg)
-        return oldParse(_, cfg)
+    def parse(_, value=None, *args, **kwargs):
+        dt = parse_date(value)
+        return oldParse(_, dt or value, *args, **kwargs)
 
     Daypy.parse = parse
