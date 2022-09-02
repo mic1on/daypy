@@ -1,6 +1,11 @@
 # -*- coding: utf-8 -*-
+"""
+对字典类型的日期支持
+"""
 from copy import deepcopy
 from datetime import datetime
+
+from daypy.utils import pretty_unit
 
 
 def dict_support(option, Daypy, daypy):
@@ -10,9 +15,10 @@ def dict_support(option, Daypy, daypy):
         if not isinstance(value, dict):
             return
 
-        _value = deepcopy(value)
+        _value = {}
+        for k, v in value.items():
+            _value[pretty_unit(k)] = v
         now = daypy()
-        print("now", now)
         _value['year'] = _value.get('year', now.y)
         _value['month'] = _value.get('month', now.M)
         _value['day'] = _value.get('day', now.W)
