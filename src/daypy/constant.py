@@ -3,7 +3,7 @@ from enum import Enum
 
 
 class UnitEnum(Enum):
-    MS = 'millisecond'
+    MS = 'microsecond'
     S = 'second'
     MIN = 'minute'
     H = 'hour'
@@ -16,7 +16,7 @@ class UnitEnum(Enum):
 
 
 class UnitsEnum(Enum):
-    MS = 'milliseconds'
+    MS = 'microseconds'
     S = 'seconds'
     MIN = 'minutes'
     H = 'hours'
