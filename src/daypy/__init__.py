@@ -6,7 +6,7 @@ from typing import Union, Callable, Optional
 import arrow
 from arrow import Arrow
 
-from daypy.utils import import_object, pretty_unit, pretty_units
+from daypy.utils import import_object, pretty_unit
 
 
 class Daypy(object):
@@ -31,7 +31,7 @@ class Daypy(object):
         return daypy(self.dt)
 
     def add(self, number: int, units: str):
-        units = pretty_units(units)
+        units = pretty_unit(units, plurality=True)
         self.dt = self.dt.shift(**{units: number})
         return self
 
@@ -140,13 +140,3 @@ def daypy(*args, **kwargs):
 
 
 daypy.extend = extend
-
-if __name__ == '__main__':
-    daypy.extend('to')
-    print(daypy('2022-11-12 10:10:20').to_dict())
-    # print(daypy('2022-11-11 18:00:00').is_before('2022-11-11 18:00:01'))
-    # print(daypy().is_before('2022-09-03 18:00:01'))
-    # print(daypy('2021-10-10').is_before('2022-09-03 18:00:01', 'year'))
-    # print(daypy('2021-10-10').is_same('2021-10-10'))
-    #
-    # print(daypy('2019-01-25').add(1, 'day').subtract(1, 'year').year(2009).unix())
