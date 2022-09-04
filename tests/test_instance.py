@@ -1,4 +1,6 @@
 # -*- coding: utf-8 -*-
+import datetime
+
 import arrow
 from daypy import daypy
 
@@ -33,3 +35,21 @@ def test_daypy():
     assert daypy('2022-12-11').end_of('day').format() == arrow.get('2022-12-11 23:59:59', tzinfo='local').format()
 
     assert daypy('2019-01-25').add(1, 'day').subtract(1, 'year').year(2009).unix() == 1232899200
+
+    # is before and is after
+    assert not daypy('2022-11-11').is_before('2022-11-11')
+    assert daypy('2021-01-09').is_before('2021-11-11')
+    assert daypy('2021-01-09').is_after('2020-11-11')
+    assert daypy('2021-01-09').is_same('2021-01-09')
+    now = datetime.datetime.now()
+    assert daypy(now).is_same(now)
+    assert daypy(
+        '1994-04-21'
+    ).add(1, 'M').add(2, 'year').subtract(1, 'day').is_same(
+        '1996-05-20'
+    )
+
+    # is between
+    assert daypy("2020-11-11").is_between("2020-11-01", "2020-11-20")
+    assert not daypy("1990-11-11").is_between("1990-11-11", "2020-01-01")
+    assert daypy("1990-11-11").is_between("1990-11-11", "2020-01-01", None, "[)")

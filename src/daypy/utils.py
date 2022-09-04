@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-from daypy.constant import UnitEnum, UnitsEnum
+from daypy.constant import Units
 
 
 def import_object(name: str):
@@ -14,49 +14,17 @@ def import_object(name: str):
         raise ImportError("No module named %s" % parts[-1])
 
 
-def pretty_unit(u: str):
+def pretty_unit(u: str, plurality: bool = False):
     if u is None:
         return u
-    special = {
-        'M': UnitEnum.M.value,
-        'y': UnitEnum.Y.value,
-        'w': UnitEnum.W.value,
-        'd': UnitEnum.D.value,
-        'D': UnitEnum.DATE.value,
-        'h': UnitEnum.H.value,
-        'm': UnitEnum.MIN.value,
-        's': UnitEnum.S.value,
-        'ms': UnitEnum.MS.value,
-        'Q': UnitEnum.Q.value
-    }
-    ret = special.get(u)
+    ret = Units.to_dict(plurality).get(u)
     if ret is not None:
         return ret
     u = u.strip().lower()
-    if u.endswith('s'):
-        return u[0:-1]
-    return u
-
-
-def pretty_units(u: str):
-    if u is None:
-        return u
-    special = {
-        'M': UnitsEnum.M.value,
-        'y': UnitsEnum.Y.value,
-        'w': UnitsEnum.W.value,
-        'd': UnitsEnum.D.value,
-        'D': UnitsEnum.DATE.value,
-        'h': UnitsEnum.H.value,
-        'm': UnitsEnum.MIN.value,
-        's': UnitsEnum.S.value,
-        'ms': UnitsEnum.MS.value,
-        'Q': UnitsEnum.Q.value
-    }
-    ret = special.get(u)
-    if ret is not None:
-        return ret
-    u = u.strip().lower()
-    if not u.endswith('s'):
-        return f"{u}s"
+    if not plurality:
+        if u.endswith('s'):
+            return u[0:-1]
+    else:
+        if not u.endswith('s'):
+            return f"{u}s"
     return u

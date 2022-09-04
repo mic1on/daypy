@@ -1,28 +1,24 @@
 # -*- coding: utf-8 -*-
-from enum import Enum
+from dataclasses import dataclass, asdict, field
 
 
-class UnitEnum(Enum):
-    MS = 'microsecond'
-    S = 'second'
-    MIN = 'minute'
-    H = 'hour'
-    D = 'day'
-    W = 'week'
-    M = 'month'
-    Q = 'quarter'
-    Y = 'year'
-    DATE = 'date'
+@dataclass
+class Units:
+    y: str = field(default='year')
+    M: str = field(default='month')
+    d: str = field(default='day')
+    h: str = field(default='hour')
+    m: str = field(default='minute')
+    s: str = field(default='second')
+    ms: str = field(default='microsecond')
+    Q: str = field(default='quarter')
+    W: str = field(default='week')
+    D: str = field(default='date')
 
-
-class UnitsEnum(Enum):
-    MS = 'microseconds'
-    S = 'seconds'
-    MIN = 'minutes'
-    H = 'hours'
-    D = 'days'
-    W = 'weeks'
-    M = 'months'
-    Q = 'quarters'
-    Y = 'years'
-    DATE = 'dates'
+    @classmethod
+    def to_dict(cls, plurality=False):
+        _dict = asdict(cls())
+        if plurality:
+            for k, v in _dict.items():
+                _dict[k] = f'{v}s'
+        return _dict
