@@ -13,22 +13,22 @@ class Daypy(object):
 
     def __init__(self, *args, **kwargs):
         self.dt: Optional[Arrow] = None
+        self.locale = kwargs.pop('locale', 'zh')
+        self.tz = kwargs.pop('tz', 'local')
         self.short_attrs = ['y', 'M', 'd', 'w', 'h', 'm', 's', 'ms']
         self.parse(*args, **kwargs)
 
     def parse(self, *args, **kwargs):
-        locale = kwargs.pop('locale', 'zh')
-        tz = kwargs.pop('tz', 'local')
 
         if args:
             arg = args[0]
             if isinstance(arg, Daypy):
-                self.dt = arrow.get(arg.dt, locale=locale, tzinfo=tz)
+                self.dt = arrow.get(arg.dt, locale=self.locale, tzinfo=self.tz)
             if arg is None:
-                self.dt = arrow.get(locale=locale, tzinfo=tz)
+                self.dt = arrow.get(locale=self.locale, tzinfo=self.tz)
 
         if not self.dt:
-            self.dt = arrow.get(locale=locale, tzinfo=tz, *args, **kwargs)
+            self.dt = arrow.get(locale=self.locale, tzinfo=self.tz, *args, **kwargs)
 
     def format(self, fmt: str = "YYYY-MM-DD HH:mm:ssZZ", locale: str = 'zh'):
         return self.dt.format(fmt, locale=locale)
@@ -166,7 +166,9 @@ class Daypy(object):
         return f'<Daypy {self.dt}>'
 
 
-def extend(plugin: Union[str, Callable], option=None):
+def extend(plugin: Union[str, Callable], option: Optional[dict] = None):
+    if option is None:
+        option = {}
     if isinstance(plugin, Callable):
         plugin_func = plugin
     elif isinstance(plugin, str):
@@ -181,3 +183,10 @@ def daypy(*args, **kwargs):
 
 
 daypy.extend = extend
+
+if __name__ == '__main__':
+    daypy.extend('human')
+    arrow.get().humanize()
+    print(daypy().humanize())
+    print(daypy("2022-09-04 21:38:09").humanize())
+    print(daypy.dehumanize("1小时前")) # noqa
