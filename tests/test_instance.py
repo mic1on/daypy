@@ -34,7 +34,7 @@ def test_daypy():
     assert daypy('2022-12-11').end_of('M').format() == arrow.get('2022-12-31 23:59:59', tzinfo='local').format()
     assert daypy('2022-12-11').end_of('day').format() == arrow.get('2022-12-11 23:59:59', tzinfo='local').format()
 
-    assert daypy('2019-01-25').add(1, 'day').subtract(1, 'year').year(2009).unix() == 1232899200
+    assert daypy('2019-01-25').add(1, 'day').subtract(1, 'year').year(2009).unix() == arrow.get('2009-01-26', tzinfo='local').timestamp()
 
     # is before and is after
     assert not daypy('2022-11-11').is_before('2022-11-11')
