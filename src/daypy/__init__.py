@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 from calendar import monthrange
 from datetime import datetime
-from typing import Union, Callable, Optional
+from typing import Union, Callable, Optional, Any
 
 import arrow
 from arrow import Arrow
@@ -19,9 +19,15 @@ class Daypy(object):
     def parse(self, *args, **kwargs):
         locale = kwargs.pop('locale', 'zh')
         tz = kwargs.pop('tz', 'local')
-        if args and args[0] is None:
-            self.dt = arrow.get(locale=locale, tzinfo=tz)
-        else:
+
+        if args:
+            arg = args[0]
+            if isinstance(arg, Daypy):
+                self.dt = arrow.get(arg.dt, locale=locale, tzinfo=tz)
+            if arg is None:
+                self.dt = arrow.get(locale=locale, tzinfo=tz)
+
+        if not self.dt:
             self.dt = arrow.get(locale=locale, tzinfo=tz, *args, **kwargs)
 
     def format(self, fmt: str = "YYYY-MM-DD HH:mm:ssZZ", locale: str = 'zh'):
@@ -74,6 +80,41 @@ class Daypy(object):
         if unit is None:
             return self == other
         return self.start_of(unit) <= other <= self.end_of(unit)
+
+    def is_between(self,
+                   start: Any,
+                   end: Any,
+                   unit: Optional[str] = None,
+                   inclusive: Optional[str] = None) -> bool:
+        """
+        检查日期是否在指定范围日期区间
+        :param start: 起始时间
+        :param end: 结束时间
+        :param unit: 比较单位
+        :param inclusive: 区间表达式：`(`表示排除 `[`表示包含
+               '()' 不包含开始和结束的日期 (默认)
+               '[]' 包含开始和结束的日期
+               '[)' 包含开始日期但不包含结束日期
+        :return:
+
+        e.g.:
+        daypy("2020-11-11").is_between("2020-11-01", "2020-11-20")  // True
+        daypy("1990-11-11").is_between("1990-11-11", "2020-01-01")  // False, 默认排除起始和结束时间
+        daypy("1990-11-11").is_between("1990-11-11", "2020-01-01", None, "[)")  // True, 包含起始,排除结束
+        """
+
+        inclusive = inclusive or "()"
+        exclude_start = inclusive[0] == "("
+        exclude_end = inclusive[1] == ")"
+        return (
+                       (self.is_after(start, unit) if exclude_start else not self.is_before(start, unit))
+                       and
+                       (self.is_before(end, unit) if exclude_end else not self.is_after(end, unit))
+               ) or (
+                       (self.is_before(start, unit) if exclude_start else not self.is_after(start, unit))
+                       and
+                       (self.is_after(end, unit) if exclude_end else not self.is_before(end, unit))
+               )
 
     def value_of(self):
         return round(self.dt.timestamp() * 1000)
