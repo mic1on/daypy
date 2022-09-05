@@ -8,7 +8,7 @@ from daypy.utils import pretty_unit
 
 
 def dict_support(option, Daypy, daypy):
-    oldParse = Daypy.parse
+    old_parse = Daypy.parse
 
     def parse_date(value):
         if not isinstance(value, dict):
@@ -29,6 +29,6 @@ def dict_support(option, Daypy, daypy):
 
     def parse(_, value=None, *args, **kwargs):
         dt = parse_date(value)
-        return oldParse(_, dt or value, *args, **kwargs)
+        return old_parse(_, dt or value, *args, **kwargs)
 
     Daypy.parse = parse
