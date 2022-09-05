@@ -1,4 +1,7 @@
 # -*- coding: utf-8 -*-
+import os
+from typing import List, Callable
+
 from daypy.constant import Units
 
 
@@ -28,3 +31,24 @@ def pretty_unit(u: str, plurality: bool = False):
         if not u.endswith('s'):
             return f"{u}s"
     return u
+
+
+def get_modules(package_path="."):
+    modules = []
+    files = os.listdir(package_path)
+
+    for file in files:
+        if not file.startswith("__"):
+            name, ext = os.path.splitext(file)
+            modules.append(name)
+
+    return modules
+
+
+def get_plugin_names() -> List[str]:
+    from daypy import plugins
+    return get_modules(plugins.__path__[0])
+
+
+def get_plugin_modules() -> List[Callable]:
+    return [import_object(f'daypy.plugins.{name}.{name}') for name in get_plugin_names()]
