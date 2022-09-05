@@ -1,6 +1,9 @@
 # -*- coding: utf-8 -*-
+from typing import List, Dict
+
+
 def to(option, Daypy, daypy):
-    def _to_array(this):
+    def _to_array(this) -> List:
         return [
             this.y,
             this.M,
@@ -11,7 +14,7 @@ def to(option, Daypy, daypy):
             this.ms
         ]
 
-    def _to_dict(this):
+    def _to_dict(this) -> Dict:
         return {
             'year': this.y,
             'month': this.M,

@@ -1,12 +1,12 @@
 # -*- coding: utf-8 -*-
 from calendar import monthrange
 from datetime import datetime
-from typing import Union, Callable, Optional, Any
+from typing import Union, Callable, Optional, Any, List
 
 import arrow
 from arrow import Arrow
 
-from daypy.utils import import_object, pretty_unit
+from daypy.utils import import_object, pretty_unit, get_plugin_names
 
 
 class Daypy(object):
@@ -150,7 +150,7 @@ class Daypy(object):
     def __eq__(self, other):
         return self.dt == other.dt
 
-    def __getattr__(self, attr):
+    def __getattr__(self, attr: str):
         # 特殊简写属性返回对应的值
         if attr in self.short_attrs:
             return getattr(self.dt, pretty_unit(attr))
@@ -166,27 +166,31 @@ class Daypy(object):
         return f'<Daypy {self.dt}>'
 
 
-def extend(plugin: Union[str, Callable], option: Optional[dict] = None):
-    if option is None:
-        option = {}
-    if isinstance(plugin, Callable):
-        plugin_func = plugin
-    elif isinstance(plugin, str):
-        plugin_func = import_object(f"daypy.plugins.{plugin}")
-    else:
-        raise TypeError(f"plugin must be str or callable, but got {type(plugin)}")
-    plugin_func(option, Daypy, daypy)
-
-
-def daypy(*args, **kwargs):
+def daypy(*args, **kwargs) -> "Daypy":
     return Daypy(*args, **kwargs)
 
 
-daypy.extend = extend
+def init_extend():
+    def extend(plugin: Union[str, Callable, List[Union[str, Callable]]],
+               option: Optional[dict] = None):
+        if option is None:
+            option = {}
+        if isinstance(plugin, Callable):
+            plugin_func = plugin
+        elif isinstance(plugin, str):
+            plugin_func = import_object(f"daypy.plugins.{plugin}.{plugin}")
+        elif isinstance(plugin, list):
+            [extend(pg, {}) for pg in plugin]
+            return
+        else:
+            raise TypeError(f"plugin must be str/callable/list, but got {type(plugin)}")
+        plugin_func(option, Daypy, daypy)
 
-if __name__ == '__main__':
-    daypy.extend('human')
-    arrow.get().humanize()
-    print(daypy().humanize())
-    print(daypy("2022-09-04 21:38:09").humanize())
-    print(daypy.dehumanize("1小时前")) # noqa
+    def extends():
+        return get_plugin_names()
+
+    daypy.extend = extend
+    daypy.extends = extends
+
+
+init_extend()

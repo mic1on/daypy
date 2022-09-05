@@ -2,7 +2,7 @@
 from dataclasses import dataclass, asdict, field
 
 
-@dataclass
+@dataclass(frozen=True)
 class Units:
     y: str = field(default='year')
     M: str = field(default='month')

@@ -2,10 +2,7 @@
 """
 对数组类型的日期支持
 """
-from copy import deepcopy
 from datetime import datetime
-
-from daypy.utils import pretty_unit
 
 
 def array_support(option, Daypy, daypy):
