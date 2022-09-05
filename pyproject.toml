@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "daypy"
-version = "0.1.9"
+version = "0.2.0"
 description = "一个日期时间解析器"
 authors = ["miclon <jcnd@163.com>"]
 homepage = "https://github.com/mic1on/daypy"
