@@ -122,6 +122,28 @@ class Daypy(object):
     def unix(self):
         return round(self.value_of() / 1000)
 
+    def get(self, unit: str) -> int:
+        """
+        返回当前对象的时间单位值。
+        各个传入的单位对大小写不敏感，支持缩写和复数。
+        请注意，缩写是区分大小写的。
+        :param unit: 时间单位: year/month/day...
+        :return
+        """
+        return self._getter(pretty_unit(unit))
+
+    def set(self, unit: str, value: int) -> "Daypy":
+        """
+        设置当前对象的时间单位值。
+        各个传入的单位对大小写不敏感，支持缩写和复数。
+        请注意，缩写是区分大小写的。
+        调用后返回一个修改后的新实例。
+        :param unit: 时间单位: year/month/day...
+        :param value: 时间单位值
+        """
+        self._setter(pretty_unit(unit), value)
+        return self.clone()
+
     def _getter(self, attr, *args, **kwargs):
         if hasattr(self.dt, attr):
             return getattr(self.dt, attr)
@@ -193,4 +215,12 @@ def init_extend():
     daypy.extends = extends
 
 
+def init_instance():
+    def unix(timestamp: int) -> "Daypy":
+        return daypy(round(timestamp * 1000))
+
+    daypy.unix = unix
+
+
 init_extend()
+init_instance()

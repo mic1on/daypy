@@ -44,7 +44,7 @@ def _parse_datetime_str(val):
 
 
 def zh_support(option, Daypy, daypy):
-    oldParse = Daypy.parse
+    old_parse = Daypy.parse
 
     def parse_date(value, *args, **kwargs):
         # 如果存在第二参数，且第一参数不是字符串，不解析
@@ -55,6 +55,6 @@ def zh_support(option, Daypy, daypy):
 
     def parse(_, value=None, *args, **kwargs):
         dt = parse_date(value, *args, **kwargs)
-        return oldParse(_, dt or value, *args, **kwargs)
+        return old_parse(_, dt or value, *args, **kwargs)
 
     Daypy.parse = parse
