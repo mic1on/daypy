@@ -14,5 +14,12 @@
 `daypy`是使用`arrow`为基础，开发的一个插件式的时间解析模块。
 模块的命名及设计模式参考了`dayjs`(JavaScript下的时间处理模块)。
 
+### 安装
 
-### 文档编写中...
+```bash
+pip install daypy -U
+```
+
+### 示例及文档
+
+[官方文档](https://52caiji.com/posts/other/opensource/daypy.html)
