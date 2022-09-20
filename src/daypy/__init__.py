@@ -8,6 +8,13 @@ from arrow import Arrow
 
 from daypy.utils import import_object, pretty_unit, get_plugin_names
 
+UnitType = Optional[
+    Literal[
+        "year", "month", "day", "hour", "minute", "second", "microsecond",
+        "y", "M", "d", "w", "h", "m", "s", "ms"
+    ]
+]
+
 
 class Daypy(object):
 
@@ -39,13 +46,7 @@ class Daypy(object):
     def add(
             self,
             number: int,
-            units: Optional[
-                Literal[
-                    "years", "months", "days", "hours", "minutes", "seconds", "microseconds", "quarters", "weeks",
-                    "y", "M", "d", "w", "h", "m", "s", "ms", "Q", "D",
-                    "year", "month", "day", "hour", "minute", "second", "microsecond", "quarter", "week"
-                ]
-            ]
+            units: UnitType
     ):
         units = pretty_unit(units, plurality=True)
         dt = self.dt.shift(**{units: number})
@@ -54,24 +55,13 @@ class Daypy(object):
     def subtract(
             self,
             number: int,
-            units: Optional[
-                Literal[
-                    "years", "months", "days", "hours", "minutes", "seconds", "microseconds", "quarters", "weeks",
-                    "y", "M", "d", "w", "h", "m", "s", "ms", "Q", "D",
-                    "year", "month", "day", "hour", "minute", "second", "microsecond", "quarter", "week"
-                ]
-            ]
+            units: UnitType
     ):
         return self.add(-number, units)
 
     def start_of(
             self,
-            unit: Optional[
-                Literal[
-                    "year", "month", "day", "hour", "minute", "second", "microsecond",
-                    "y", "M", "d", "w", "h", "m", "s", "ms"
-                ]
-            ] = None,
+            unit: UnitType = None,
             start_of: bool = True
     ):
         unit = pretty_unit(unit)
@@ -90,24 +80,14 @@ class Daypy(object):
 
     def end_of(
             self,
-            unit: Optional[
-                Literal[
-                    "year", "month", "day", "hour", "minute", "second", "microsecond",
-                    "y", "M", "d", "w", "h", "m", "s", "ms"
-                ]
-            ] = None
+            unit: UnitType = None
     ) -> "Daypy":
         return self.start_of(unit, start_of=False)
 
     def is_before(
             self,
             value,
-            unit: Optional[
-                Literal[
-                    "year", "month", "day", "hour", "minute", "second", "microsecond",
-                    "y", "M", "d", "w", "h", "m", "s", "ms"
-                ]
-            ] = None
+            unit: UnitType = None
     ) -> bool:
         """检查当前对象是否在指定时间之前"""
         if unit is None:
@@ -117,12 +97,7 @@ class Daypy(object):
     def is_after(
             self,
             value,
-            unit: Optional[
-                Literal[
-                    "year", "month", "day", "hour", "minute", "second", "microsecond",
-                    "y", "M", "d", "w", "h", "m", "s", "ms"
-                ]
-            ] = None
+            unit: UnitType = None
     ) -> bool:
         """检查当前对象是否在指定时间之后"""
         if unit is None:
@@ -132,12 +107,7 @@ class Daypy(object):
     def is_same(
             self,
             value,
-            unit: Optional[
-                Literal[
-                    "year", "month", "day", "hour", "minute", "second", "microsecond",
-                    "y", "M", "d", "w", "h", "m", "s", "ms"
-                ]
-            ] = None
+            unit: UnitType = None
     ):
         """检查当前对象是否与指定时间相同"""
         other = daypy(value)
@@ -149,12 +119,7 @@ class Daypy(object):
             self,
             start: Any,
             end: Any,
-            unit: Optional[
-                Literal[
-                    "year", "month", "day", "hour", "minute", "second", "microsecond",
-                    "y", "M", "d", "w", "h", "m", "s", "ms"
-                ]
-            ] = None,
+            unit: UnitType = None,
             inclusive: Optional[str] = None
     ) -> bool:
         """
@@ -198,12 +163,7 @@ class Daypy(object):
 
     def get(
             self,
-            unit: Optional[
-                Literal[
-                    "year", "month", "day", "hour", "minute", "second", "microsecond",
-                    "y", "M", "d", "w", "h", "m", "s", "ms"
-                ]
-            ]
+            unit: UnitType
     ) -> int:
         """
         返回当前对象的时间单位值。
@@ -216,12 +176,7 @@ class Daypy(object):
 
     def set(
             self,
-            unit: Optional[
-                Literal[
-                    "year", "month", "day", "hour", "minute", "second", "microsecond",
-                    "y", "M", "d", "w", "h", "m", "s", "ms"
-                ]
-            ],
+            unit: UnitType,
             value: int
     ) -> "Daypy":
         """
