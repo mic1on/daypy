@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 from calendar import monthrange
 from datetime import datetime
-from typing import Union, Callable, Optional, Any, List
+from typing import Union, Callable, Optional, Any, List, Literal
 
 import arrow
 from arrow import Arrow
@@ -36,19 +36,48 @@ class Daypy(object):
     def clone(self):
         return daypy(self.dt)
 
-    def add(self, number: int, units: str):
+    def add(
+            self,
+            number: int,
+            units: Optional[
+                Literal[
+                    "years", "months", "days", "hours", "minutes", "seconds", "microseconds", "quarters", "weeks",
+                    "y", "M", "d", "w", "h", "m", "s", "ms", "Q", "D",
+                    "year", "month", "day", "hour", "minute", "second", "microsecond", "quarter", "week"
+                ]
+            ]
+    ):
         units = pretty_unit(units, plurality=True)
-        self.dt = self.dt.shift(**{units: number})
-        return self
+        dt = self.dt.shift(**{units: number})
+        return daypy(dt)
 
-    def subtract(self, number: int, units: str):
+    def subtract(
+            self,
+            number: int,
+            units: Optional[
+                Literal[
+                    "years", "months", "days", "hours", "minutes", "seconds", "microseconds", "quarters", "weeks",
+                    "y", "M", "d", "w", "h", "m", "s", "ms", "Q", "D",
+                    "year", "month", "day", "hour", "minute", "second", "microsecond", "quarter", "week"
+                ]
+            ]
+    ):
         return self.add(-number, units)
 
-    def start_of(self, unit: Optional[str] = None, start_of: bool = True):
+    def start_of(
+            self,
+            unit: Optional[
+                Literal[
+                    "year", "month", "day", "hour", "minute", "second", "microsecond",
+                    "y", "M", "d", "w", "h", "m", "s", "ms"
+                ]
+            ] = None,
+            start_of: bool = True
+    ):
         unit = pretty_unit(unit)
 
         se = datetime.min if start_of else datetime.max
-        units = ['year', 'month', 'day', 'hour', 'minute', 'second', 'microsecond']
+        units = ["year", "month", "day", "hour", "minute", "second", "microsecond"]
         for u in units:
             if u == 'month' and not start_of:
                 _date = {'year': self.y, 'month': self.M, 'day': monthrange(self.y, self.M)[1]}
@@ -59,38 +88,80 @@ class Daypy(object):
                 break
         return daypy(se)
 
-    def end_of(self, unit: Optional[str] = None) -> "Daypy":
+    def end_of(
+            self,
+            unit: Optional[
+                Literal[
+                    "year", "month", "day", "hour", "minute", "second", "microsecond",
+                    "y", "M", "d", "w", "h", "m", "s", "ms"
+                ]
+            ] = None
+    ) -> "Daypy":
         return self.start_of(unit, start_of=False)
 
-    def is_before(self, value, unit: Optional[str] = None) -> bool:
+    def is_before(
+            self,
+            value,
+            unit: Optional[
+                Literal[
+                    "year", "month", "day", "hour", "minute", "second", "microsecond",
+                    "y", "M", "d", "w", "h", "m", "s", "ms"
+                ]
+            ] = None
+    ) -> bool:
         """检查当前对象是否在指定时间之前"""
         if unit is None:
             return self < daypy(value)
         return self.end_of(unit) < daypy(value)
 
-    def is_after(self, value, unit: Optional[str] = None) -> bool:
+    def is_after(
+            self,
+            value,
+            unit: Optional[
+                Literal[
+                    "year", "month", "day", "hour", "minute", "second", "microsecond",
+                    "y", "M", "d", "w", "h", "m", "s", "ms"
+                ]
+            ] = None
+    ) -> bool:
         """检查当前对象是否在指定时间之后"""
         if unit is None:
             return self > daypy(value)
         return self.start_of(unit) > daypy(value)
 
-    def is_same(self, value, unit=None):
+    def is_same(
+            self,
+            value,
+            unit: Optional[
+                Literal[
+                    "year", "month", "day", "hour", "minute", "second", "microsecond",
+                    "y", "M", "d", "w", "h", "m", "s", "ms"
+                ]
+            ] = None
+    ):
         """检查当前对象是否与指定时间相同"""
         other = daypy(value)
         if unit is None:
             return self == other
         return self.start_of(unit) <= other <= self.end_of(unit)
 
-    def is_between(self,
-                   start: Any,
-                   end: Any,
-                   unit: Optional[str] = None,
-                   inclusive: Optional[str] = None) -> bool:
+    def is_between(
+            self,
+            start: Any,
+            end: Any,
+            unit: Optional[
+                Literal[
+                    "year", "month", "day", "hour", "minute", "second", "microsecond",
+                    "y", "M", "d", "w", "h", "m", "s", "ms"
+                ]
+            ] = None,
+            inclusive: Optional[str] = None
+    ) -> bool:
         """
         检查日期是否在指定范围日期区间
         :param start: 起始时间
         :param end: 结束时间
-        :param unit: 比较单位
+        :param unit: 比较单位 Union["year", "month", "day", "hour", "minute", "second", "microsecond", NoneType]
         :param inclusive: 区间表达式：`(`表示排除 `[`表示包含
                '()' 不包含开始和结束的日期 (默认)
                '[]' 包含开始和结束的日期
@@ -116,29 +187,49 @@ class Daypy(object):
                        (self.is_after(end, unit) if exclude_end else not self.is_before(end, unit))
                )
 
+    def timestamp(self):
+        return self.dt.timestamp()
+
     def value_of(self):
         return round(self.dt.timestamp() * 1000)
 
     def unix(self):
-        return round(self.value_of() / 1000)
+        return round(self.dt.timestamp())
 
-    def get(self, unit: str) -> int:
+    def get(
+            self,
+            unit: Optional[
+                Literal[
+                    "year", "month", "day", "hour", "minute", "second", "microsecond",
+                    "y", "M", "d", "w", "h", "m", "s", "ms"
+                ]
+            ]
+    ) -> int:
         """
         返回当前对象的时间单位值。
         各个传入的单位对大小写不敏感，支持缩写和复数。
         请注意，缩写是区分大小写的。
-        :param unit: 时间单位: year/month/day...
+        :param unit: 时间单位: Union["year", "month", "day", "hour", "minute", "second", "microsecond", NoneType]
         :return
         """
         return self._getter(pretty_unit(unit))
 
-    def set(self, unit: str, value: int) -> "Daypy":
+    def set(
+            self,
+            unit: Optional[
+                Literal[
+                    "year", "month", "day", "hour", "minute", "second", "microsecond",
+                    "y", "M", "d", "w", "h", "m", "s", "ms"
+                ]
+            ],
+            value: int
+    ) -> "Daypy":
         """
         设置当前对象的时间单位值。
         各个传入的单位对大小写不敏感，支持缩写和复数。
         请注意，缩写是区分大小写的。
         调用后返回一个修改后的新实例。
-        :param unit: 时间单位: year/month/day...
+        :param unit: 时间单位: Union["year", "month", "day", "hour", "minute", "second", "microsecond", NoneType]
         :param value: 时间单位值
         """
         self._setter(pretty_unit(unit), value)
@@ -184,8 +275,11 @@ class Daypy(object):
 
         return wrapper
 
+    def __str__(self):
+        return self.dt.__str__()
+
     def __repr__(self):
-        return f'<Daypy {self.dt}>'
+        return f"<{self.__class__.__name__} [{self.__str__()}]>"
 
 
 def daypy(*args, **kwargs) -> "Daypy":
