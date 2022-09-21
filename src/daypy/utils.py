@@ -24,13 +24,7 @@ def pretty_unit(u: str, plurality: bool = False):
     if ret is not None:
         return ret
     u = u.strip().lower()
-    if not plurality:
-        if u.endswith('s'):
-            return u[0:-1]
-    else:
-        if not u.endswith('s'):
-            return f"{u}s"
-    return u
+    return Units.to_plural(u) if plurality else Units.to_singular(u)
 
 
 def get_modules(package_path="."):

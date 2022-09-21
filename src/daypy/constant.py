@@ -13,12 +13,24 @@ class Units:
     ms: str = field(default='microsecond')
     Q: str = field(default='quarter')
     W: str = field(default='week')
-    D: str = field(default='date')
+    D: str = field(default='date', metadata={'plurality': False})
+    WD: str = field(default='weekday', metadata={'plurality': False})
 
     @classmethod
     def to_dict(cls, plurality=False):
         _dict = asdict(cls())
-        if plurality:
-            for k, v in _dict.items():
+
+        for k, v in _dict.items():
+            field_plurality = cls.__dataclass_fields__[k].metadata.get('plurality')  # type: ignore
+            _plurality = plurality if field_plurality is None else field_plurality
+            if _plurality:
                 _dict[k] = f'{v}s'
         return _dict
+
+    @classmethod
+    def to_plural(cls, unit):
+        return unit if unit in cls.to_dict(plurality=True).values() else f"{unit}s"
+
+    @classmethod
+    def to_singular(cls, unit):
+        return unit if unit in cls.to_dict(plurality=False).values() else unit[:-1]

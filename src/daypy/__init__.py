@@ -14,6 +14,11 @@ UnitType = Optional[
         "y", "M", "d", "w", "h", "m", "s", "ms"
     ]
 ]
+UnitsType = Optional[
+    Literal[
+        "years", "months", "days", "hours", "minutes", "seconds", "microseconds", "quarters", "weeks", "weekday",
+    ]
+]
 
 
 class Daypy(object):
@@ -46,7 +51,7 @@ class Daypy(object):
     def add(
             self,
             number: int,
-            units: UnitType
+            units: Union[UnitType, UnitsType]
     ):
         units = pretty_unit(units, plurality=True)
         dt = self.dt.shift(**{units: number})
@@ -55,7 +60,7 @@ class Daypy(object):
     def subtract(
             self,
             number: int,
-            units: UnitType
+            units: Union[UnitType, UnitsType]
     ):
         return self.add(-number, units)
 
